@@ -35,6 +35,7 @@ thttpd - tiny/turbo/throttling HTTP server
 .IR maxage ]
 .RB [ -V ]
 .RB [ -D ]
+.RB [ -N ]
 .SH DESCRIPTION
 .PP
 .I thttpd
@@ -182,6 +183,12 @@ a background daemon.
 Instead it runs in the foreground like a regular program.
 This is necessary when you want to run thttpd wrapped in a little shell
 script that restarts it if it exits.
+.TP
+.B -N
+By default, when run as root thttpd will try to switch to an unprivileged
+user.  In some situations (e.g., when building thttpd statically against glibc)
+the requisite uid/gid lookups can be problematic.  This option disable the default 
+behavior, allowing a thttpd started as root to continue running root.
 .SH "CONFIG-FILE"
 .PP
 All the command-line options can also be set in a config file.

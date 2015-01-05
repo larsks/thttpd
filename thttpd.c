@@ -71,6 +71,7 @@ typedef long long int64_t;
 
 static char* argv0;
 static int debug;
+static int switch_user;
 static unsigned short port;
 static char* dir;
 static char* data_dir;
@@ -403,7 +404,7 @@ main( int argc, char** argv )
     /* If we're root and we're going to become another user, get the uid/gid
     ** now.
     */
-    if ( getuid() == 0 )
+    if ( switch_user && getuid() == 0 )
 	{
 	pwd = getpwnam( user );
 	if ( pwd == (struct passwd*) 0 )
@@ -681,7 +682,7 @@ main( int argc, char** argv )
     stats_simultaneous = 0;
 
     /* If we're root, try to become someone else. */
-    if ( getuid() == 0 )
+    if ( switch_user && getuid() == 0 )
 	{
 	/* Set aux groups to null. */
 	if ( setgroups( 0, (const gid_t*) 0 ) < 0 )
@@ -839,6 +840,7 @@ parse_args( int argc, char** argv )
     int argn;
 
     debug = 0;
+    switch_user = 1;
     port = DEFAULT_PORT;
     dir = (char*) 0;
     data_dir = (char*) 0;
@@ -977,6 +979,8 @@ parse_args( int argc, char** argv )
 	    }
 	else if ( strcmp( argv[argn], "-D" ) == 0 )
 	    debug = 1;
+	else if ( strcmp( argv[argn], "-N" ) == 0 )
+	    switch_user = 0;
 	else
 	    usage();
 	++argn;
@@ -990,7 +994,7 @@ static void
 usage( void )
     {
     (void) fprintf( stderr,
-"usage:  %s [-C configfile] [-p port] [-d dir] [-r|-nor] [-dd data_dir] [-s|-nos] [-v|-nov] [-g|-nog] [-u user] [-c cgipat] [-t throttles] [-h host] [-l logfile] [-i pidfile] [-T charset] [-P P3P] [-M maxage] [-V] [-D]\n",
+"usage:  %s [-C configfile] [-p port] [-d dir] [-r|-nor] [-dd data_dir] [-s|-nos] [-v|-nov] [-g|-nog] [-u user] [-c cgipat] [-t throttles] [-h host] [-l logfile] [-i pidfile] [-T charset] [-P P3P] [-M maxage] [-V] [-D] [-N]\n",
 	argv0 );
     exit( 1 );
     }
